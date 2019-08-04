@@ -1,82 +1,95 @@
-/*
- * UART_lab1.c
- *
- * Created: 8/1/2019 1:08:44 PM
- * Author : philipp
- */ 
+#define F_CPU 16000000UL // Define clockspeed used by MCU for delay library
 
+// Include these libraries
 #include <avr/io.h>
+#include <util/delay.h>
 
-#define UBRR 103
-#define PRIMES_NO 62
+// Declare functions
+static void usart_init(uint32_t ubrr);
+static void transmit_prepare(uint32_t data);
+static void  get_prime_nums();
+static void usart_transmit(uint8_t data);
 
-void usart_init(uint8_t ubrr);
-void usart_transmit(uint8_t data);
+// Array used for storing prime numbers to transmit
+uint16_t primeNums[62];
 
-int primes[PRIMES_NO] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293};
-
-
-int main(void)
-{
-    /* Replace with your application code */
-	usart_init(UBRR);
-	int prime_count = 0;
-	/*usart_transmit(51);*/
-	while(prime_count < 62){
-		//int remainder;
-		int number = primes[prime_count];
-		
-		int diviser = 100;
-		while(diviser > 0){
-			if(number /diviser){
-				usart_transmit((number/diviser) % 10 + 48);
-			}
-			diviser /= 10;
-			//usart_transmit(remainder+48);
-		}
-		
-		if(prime_count != 61){
-			usart_transmit(44);
-			usart_transmit(32);
-		}
-		prime_count++;
-		//if(prime_count == PRIMES_NO){
-			//prime_count = 0;
-		//}
-	}
+int main(void){
+    usart_init(9600);	// Initialise USART module
+	get_prime_nums();	// Get prime numbers to transmit
+	
     while (1) 
-	{
-	;
-    }
-	
+    {	
+		// Transmit each prime number in the format: x, x, x....
+		for(int i = 0; i < 62; i++){
+			transmit_prepare(primeNums[i]);
+			if(i < 61){
+				usart_transmit(44);
+				usart_transmit(32);
+			}
+		}
+		
+		// Display next set of prime numbers on a new line
+		usart_transmit(13);
+		usart_transmit(10); // newline
+	}
 }
 
-void usart_init(uint8_t ubrr){
-	UCSR0A = 0x0;
-	UCSR0B = 0x68;
-	UCSR0C = 0x6;
-	
-	/* Clock divider value. Note we sample 16 times per pulse*/
-	UBRR0 = ubrr;
-	
+// Function to set control registers for USART (UART parameters: 9600/8n1)
+static void usart_init(uint32_t ubrr){
+	UCSR0A = 0x00;
+	UCSR0B = 0x08;
+	UCSR0C = 0x06;
+	UBRR0 = (16000000 / (16 * ubrr)) - 1;	// calculation to set UBRR register so that baud rate is 9600 for give clock frequency
 }
 
-void usart_transmit(uint8_t data){
+// Calculate all the prime numbers under 300
+
+static void get_prime_nums(){
+	uint8_t primeNum = 1;
+	uint16_t arrayIndex = 0;
 	
-	/*check whether the UDRE0 bit is set to see whether the data register is empty*/
-	while((UCSR0A & 0x20) == 0){
-		; /*wait*/
+	// Determines which numbers under 300 are prime numbers
+	for(uint16_t count = 2; count < 300; count++){
+		for(uint16_t divisor = 2; divisor < count; divisor++){
+			if((count % divisor) == 0) {
+				primeNum = 0;
+				break;
+			}
+			else {
+				primeNum = 1;
+			}
+		}
+		
+		// If number is a prime number then store it in primeNums array
+		if(primeNum){
+			primeNums[arrayIndex] = count;
+			arrayIndex++;
+		}
+	}
+}
+
+// Separates and sends individual digits of number in ASCII
+static void transmit_prepare(uint32_t data){
+	uint32_t check = 1;
+	uint32_t divisor = 1;
+	
+	// Determines largest divisor that puts the number in the highest column of number into ones column
+	while(check > 0){
+		check = data / divisor;
+		divisor = divisor * 10;
 	}
 	
-	UDR0 = data;
-}
-
-int max_diviser(int number){
-	int diviser = 10;
-	while(number/diviser){
-		diviser *= 10;
+	divisor = divisor / 100;	// Undo last unnecessary multiplication of divisor in while loop
+	
+	// for each digit in number...
+	while(divisor > 0){
+		usart_transmit((data / divisor) + 48);	// Send ASCII equivalent of number to usart_transmit() for transmission
+		data -= (data / divisor) * divisor;	// Remove digit just sent from number
+		divisor = divisor / 10;	// Adjust divisor to get next digit
 	}
-	diviser *= 10;
-	return diviser;
 }
 
+static void usart_transmit(uint8_t data){
+	while((UCSR0A & (1<<UDRE0)) == 0){}	// Wait for USART Data Register Empty flag
+	UDR0 = data;	// Put data byte into UDR register so it can be sent via USART connect
+}
