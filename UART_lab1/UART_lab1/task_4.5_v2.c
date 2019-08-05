@@ -15,10 +15,8 @@
 
 void usart_init(uint8_t ubrr);
 void usart_transmit(uint8_t data);
-int diviser(int number);
+int max_diviser(int number);
 int* generate_primes(int num_of_primes);
-
-//int primes[PRIMES_NO] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293};
 
 
 int main(void)
@@ -26,25 +24,27 @@ int main(void)
 
 	usart_init(UBRR);
 	int prime_count = 0;
+	int *primes = generate_primes(PRIMES_NO);
 
-	while(prime_count < PRIMES_NO){
-        int *primes = generate_primes(PRIMES_NO);
-		int number = primes[prime_count];
-		
-		int diviser = max_diviser(number);
-
-		usart_transmit((number/diviser) % 10 + 48);
-	
-		/*Don't print the last comma and space*/
-		if(prime_count != PRIMES_NO -1){
-			usart_transmit(44);
-			usart_transmit(32);
-		}
-		prime_count++;
-	}
     while (1) 
 	{
-	;
+		if(prime_count < PRIMES_NO){
+			int number = primes[prime_count];
+		
+			int diviser = max_diviser(number);
+			
+			while(diviser > 0){
+				usart_transmit((number/diviser) % 10 + 48);
+				diviser /= 10;
+			}
+		
+			/*Don't print the last comma and space*/
+			if(prime_count != PRIMES_NO -1){
+				usart_transmit(44); /*comma*/
+				usart_transmit(32); /*space*/
+			}
+			prime_count++;
+		}
     }
 	
 }
@@ -55,7 +55,7 @@ void usart_init(uint8_t ubrr){
 	UCSR0C = 0x6;
 	
 	/* Clock divider value. Note we sample 16 times per pulse*/
-	UBRR0 = ubrr;
+	UBRR0 = UBRR;
 	
 }
 
