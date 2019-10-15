@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "../algorithms/i_rms.h"
 #include "../algorithms/v_peak.h"
 #include "state_machine.h"
 
@@ -49,6 +50,8 @@ void FSM_tick(void)
 			v_peak = get_v_peak();
 			break;
 		case STATE_I_RMS:
+
+			i_rms = get_rms_current();
 
 			current_state = STATE_AVG_POWER;
 			break;
