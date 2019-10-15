@@ -46,7 +46,7 @@ void FSM_tick(void)
 	switch (current_state) {
 		case STATE_V_PEAK:
 			current_state = STATE_I_RMS;
-			v_peak =
+			v_peak = get_v_peak();
 			break;
 		case STATE_I_RMS:
 
