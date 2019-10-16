@@ -14,7 +14,6 @@
 #define BUTTON_INPUT_PORT		PINB
 #define BUTTON_PIN				7
 
-static uint16_t adc_count_to_voltage(uint16_t adc_count);
 uint16_t convert_count_to_i_rms(uint16_t adc_count);
 uint16_t convert_count_to_v_peak(uint16_t adc_count);
 uint16_t convert_adc_count_to_mv(uint16_t adc_count);

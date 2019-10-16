@@ -10,7 +10,7 @@ to be more accurate*/
 
 #define CURRENT_AMPLIFICATION_UNDO 27000/82
 
-static uint16_t adc_count_to_voltage(uint16_t adc_count)
+static uint16_t convert_adc_count_to_mv(uint16_t adc_count)
 {
 	uint32_t millivolts = (uint32_t)adc_count* (uint32_t)5000 / 1024; /*convert to 32 bit to prevent overflow when multiplying by 5000*/
 	return millivolts;
@@ -30,14 +30,8 @@ uint16_t convert_count_to_i_rms(uint16_t adc_count)
 
 uint16_t convert_count_to_v_peak(uint16_t adc_count)
 {
-	uint16_t adc_voltage = adc_count_to_voltage(adc_count);
+	uint16_t adc_voltage = adc_count_to_mv(adc_count);
 	uint16_t v_peak = (uint16_t)((uint32_t)((adc_voltage - OFFSET_VOLTAGE) * DIVIDER_RATIO)/1024);
 
 	return v_peak;
-}
-
-uint16_t convert_adc_count_to_mv(uint16_t adc_count)
-{
-	uint32_t mv = (uint32_t)adc_value * (uint32_t)5000 / 1024;
-	return (uint16_t) mv
 }
