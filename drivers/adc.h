@@ -12,6 +12,6 @@
 #include <avr/io.h>
 
 void ADC_initialise(void);
-uint16_t ADC_convert_channel_to_mv(uint8_t channel);
+uint16_t ADC_convert_channel(uint8_t channel);
 
 #endif /* ADC_H_ */

@@ -1,4 +1,5 @@
 #include "v_peak.h"
+#include "../conversions.h"
 #include "../drivers/adc.h"
 
 #define WAVE_SAMPLES 19 //for 52 us sampling rate
@@ -12,7 +13,7 @@ uint16_t get_peak_voltage()
 
 	uint8_t i;
 	for (i=0; i < WAVE_SAMPLES; i++) {
-		sample = ADC_convert_channel_to_mv(VOLTAGE_CHANNEL);
+		sample = ADC_convert_channel(VOLTAGE_CHANNEL);
 		//get maximum amplitude (may be negative part of wave)
 		sample_amplitude = abs(VOLTAGE_OFFSET - sample);
 
@@ -20,5 +21,5 @@ uint16_t get_peak_voltage()
 			max_sample_amplitude = sample_amplitude;
 		}
 	}
-	return max_sample_amplitude;
+	return adc_count_to_mv(max_sample_amplitude);
 }
