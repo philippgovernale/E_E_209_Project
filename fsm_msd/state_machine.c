@@ -11,6 +11,8 @@
 
 #include "../algorithms/i_rms.h"
 #include "../algorithms/v_peak.h"
+#include "../algorithms/avg_power.h"
+
 #include "state_machine.h"
 
 enum state {
@@ -24,8 +26,6 @@ enum state {
 
 #define NUMBER_OF_ADC_SAMPLES				10
 #define ADC_CONVERSION_FACTOR				2
-
-static uint16_t convert_adc_reading_to_millivolts(uint16_t adc_reading);
 
 struct msd_interface* interface_ptr;
 
@@ -46,17 +46,15 @@ void FSM_tick(void)
 
 	switch (current_state) {
 		case STATE_V_PEAK:
-			current_state = STATE_I_RMS;
 			v_peak = get_v_peak();
+			current_state = STATE_I_RMS;
 			break;
 		case STATE_I_RMS:
-
 			i_rms = get_rms_current();
-
 			current_state = STATE_AVG_POWER;
 			break;
 		case STATE_AVG_POWER:
-
+			avg_power = get_avg_power();
 			current_state = STATE_POWER_FACTOR;
 			break;
 		case STATE_POWER_FACTOR:
@@ -69,9 +67,4 @@ void FSM_tick(void)
 			current_state = STATE_INITIAL;
 			break;
 	}
-}
-
-static uint16_t convert_adc_reading_to_millivolts(uint16_t adc_reading)
-{
-	return adc_reading * ADC_CONVERSION_FACTOR;
 }

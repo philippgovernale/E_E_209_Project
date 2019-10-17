@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "avg_power.h"
 #include "../drivers/adc.h"
 #include "../conversions.h"
@@ -14,7 +15,7 @@ uint16_t* inst_pow(uint16_t first_v)
     uint16_t current_r = ADC_convert_channel(CURRENT_CHANNEL);
     uint16_t second_v = ADC_convert_channel(VOLTAGE_CHANNEL);
 
-    avg_voltage = (first_v + second_v)/2;
+    uint16_t avg_voltage = (first_v + second_v)/2;
 
     avg_voltage = convert_count_to_v_peak(avg_voltage);
     current_r = convert_count_to_i_rms(current_r);
@@ -39,11 +40,11 @@ uint16_t get_avg_power()
     int i;
     for(i=0; i < N_SAMPLES; i++){
         free(data_pair);
-        uint32_t *data_pair = inst_pow(first_v);
+        uint16_t *data_pair = inst_pow(first_v);
         power_sum += data_pair[0];
         first_v = data_pair[1];
     }
 
     uint16_t avg_power_mw = power_sum/ N_SAMPLES;
-    return avg_power_mv;
+    return avg_power_mw;
 }

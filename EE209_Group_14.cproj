@@ -44,15 +44,15 @@
     <avrtoolinterface>debugWIRE</avrtoolinterface>
     <AsfFrameworkConfig>
       <framework-data xmlns="">
-  <options />
-  <configurations />
-  <files />
-  <documentation help="" />
-  <offline-documentation help="" />
-  <dependencies>
-    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.40.0" />
-  </dependencies>
-</framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.40.0" />
+        </dependencies>
+      </framework-data>
     </AsfFrameworkConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -134,7 +134,34 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="configuration.h">
+    <Compile Include="Algorithms\avg_power.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\avg_power.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\i_rms.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\i_rms.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\pf.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\pf.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\v_peak.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Algorithms\v_peak.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="conversions.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="conversions.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="drivers\adc.c">
@@ -176,11 +203,19 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Transmission\transmission.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Transmission\transmission.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Algorithms\" />
     <Folder Include="drivers" />
     <Folder Include="lib_sort" />
     <Folder Include="fsm_msd" />
+    <Folder Include="Transmission\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
 </Project>

@@ -8,7 +8,7 @@
 
 
 uint16_t get_rms_current(){
-    uint16_t i_rms_count ; 
+    uint16_t i_rms_count = 0; 
 
 
     for(int i = 0; i < NUMBER_OF_SAMPLES; i++){
@@ -16,10 +16,10 @@ uint16_t get_rms_current(){
 	}
 
 	i_rms_count /= NUMBER_OF_SAMPLES ;
-	i_rms_count = sqrt(i_rms) ; //  root mean square ADC COUNT
+	i_rms_count = sqrt(i_rms_count) ; //  root mean square ADC COUNT
 
-	i_rms_count = convert_count_to_i_rms(i_rms); // convert to milliamps
+	i_rms_count = convert_count_to_i_rms(i_rms_count); // convert to milliamps
 
 
-
+	return i_rms_count;
 }

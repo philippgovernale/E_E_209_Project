@@ -26,6 +26,14 @@ ISR(INT1_vect){
 	TCNT0 = 0;
 }
 
+/*16 bit timer which we could use with no prescaler*/
+void TIMER_initialise_TC1()
+{
+	TCCR1A = 0;
+	TCCR1B = 0b00000001;
+
+}
+
 // This function waits for the timer to overflow. An overflow occurs
 // every milliseconds. Each overflow it increments a count variable.
 // This is continued until the number of milliseconds requested have
