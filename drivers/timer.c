@@ -1,36 +1,51 @@
-/*
- * timer.c
- *
- * Created: 8/09/2018 3:23:01 PM
- *  Author: t_sco
- */
-
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include "timer.h"
 
-extern volatile uint16_t timer_count = 0;
-// This function initialises the timer with a 1 millisecond range
-void TIMER_initialise(void)
+/* ensure variable is accessible by ISR */
+volatile uint16_t timer_count = 0;
+
+/*current zero crossing interrupt*/
+ISR(INT0_vect){
+	TCNT1 = 0;
+}
+
+/*voltage zero crossing interrupt*/
+ISR(INT1_vect){
+	timer_count = TCNT1;
+	TCNT1 = 0;
+}
+
+uint16_t get_timer_count(){
+	return timer_count;
+}
+
+// initialise timer 0 (8 bit) with a 1 millisecond range
+void timer_initialise_TC0()
 {
 	TCCR0A = 0;
 	TCCR0B = 0b00000011;
 	OCR0A = 250;
 }
 
-ISR(INT0_vect){
-	TCNT0 = 0;
+/* initialise zero crossing interrupts*/
+void extint_init(uint8_t pin){
+	EIMSK |= (1 << pin);
+	
+	EICRA &= 0xF0;
+	/*intialise both INT0 and INT1 for rising edge*/
+	EICRA |= (1 << ISC00);
+	EICRA |= (1 << ISC01);
+	EICRA |= (1 << ISC10);
+	EICRA |= (1 << ISC11);
 }
 
-ISR(INT1_vect){
-	timer_count = TCNT0;
-	TCNT0 = 0;
-}
 
-/*16 bit timer which we could use with no prescaler*/
-void TIMER_initialise_TC1()
+/*Timer 1 (16 bit) initialised with no prescaler*/
+void timer_initialise_TC1()
 {
 	TCCR1A = 0;
-	TCCR1B = 0b00000001;
+	TCCR1B = 1;
 
 }
 
@@ -38,7 +53,7 @@ void TIMER_initialise_TC1()
 // every milliseconds. Each overflow it increments a count variable.
 // This is continued until the number of milliseconds requested have
 // been passed
-void TIMER_wait(uint32_t milliseconds)
+void timer_wait(uint32_t milliseconds)
 {
 	uint32_t timer_overflows = 0;
 

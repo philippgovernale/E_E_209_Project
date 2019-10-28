@@ -1,19 +1,12 @@
-/*
- * timer.h
- *
- * Created: 8/09/2018 3:28:56 PM
- *  Author: t_sco
- */
-
-
 #ifndef TIMER_H_
 #define TIMER_H_
 
-#include <avr/io.h>
+#include <stdint.h>
 
-void TIMER_initialise(void);
-void TIMER_wait(uint32_t milliseconds);
-
-extern volatile uint16_t timer_count;
+uint16_t get_timer_count();
+void timer_initialise_TC0();
+void timer_wait(uint32_t milliseconds);
+void timer_initialise_TC1();
+void extint_init(uint8_t pin);
 
 #endif /* TIMER_H_ */

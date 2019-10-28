@@ -1,21 +1,16 @@
-/*
- * adc.c
- *
- * Created: 8/09/2018 3:22:50 PM
- *  Author: t_sco
- */
-
 #include <avr/io.h>
 #include "adc.h"
 
-void ADC_initialise(void)
+void adc_initialise(void)
 {
+	/* set AVCC (5V) as ADC voltage reference*/
 	ADMUX = 0x40;
+	/* set ADC clock prescaler to 128*/ 
 	ADCSRA = 0x87;
 	ADCSRB = 0x00;
 }
 
-uint16_t ADC_convert_channel(uint8_t channel)
+uint16_t adc_convert_channel(uint8_t channel)
 {
 	// Set channel
 	ADMUX &= 0xF0;
